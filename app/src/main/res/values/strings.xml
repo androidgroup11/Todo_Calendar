@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">SwipeTest</string>
+    <string name="tab_text_1">To Do List</string>
+    <string name="tab_text_2">Calendar</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="mark_as_completed">Mark as completed</string>
+    <string name="reset">Reset</string>
+</resources>
