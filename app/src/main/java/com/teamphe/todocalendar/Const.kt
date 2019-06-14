@@ -1,6 +1,6 @@
 package com.teamphe.todocalendar
 
-import android.os.FileObserver.CREATE
+//Chứa các hằng số để dễ sử dụng trong toàn chương trình
 
 const val DB_NAME = "ToDoList"
 const val DB_VERSION = 1
@@ -14,7 +14,6 @@ const val TABLE_TODO_ITEM = "ToDoItem"
 const val COL_TODO_ID = "toDoId"
 const val COL_ITEM_NAME = "itemName"
 const val COL_IS_COLPLETED = "isCompleted"
-
 
 
 const val INTENT_TODO_ID = "TodoId"
