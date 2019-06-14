@@ -15,7 +15,6 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
-import com.teamphe.todocalendar.R
 import kotlinx.android.synthetic.main.activity_dashboard.*
 
 class DashboardActivity : Fragment() {
@@ -25,12 +24,10 @@ class DashboardActivity : Fragment() {
     override fun onAttach(context: Context?) {
         super.onAttach(context)
     }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        //setContentView(R.layout.activity_dashboard)
-        //setSupportActionBar(dashboard_toolbar)
-        //title = "Dashboard"
         dbHandler = DBHandler(this.context!!)
         rv_dashboard.layoutManager = LinearLayoutManager(this.context)
 
@@ -100,10 +97,10 @@ class DashboardActivity : Fragment() {
             holder.toDoName.text = list[p1].name
 
             holder.toDoName.setOnClickListener {
-                val intent = Intent(activity.context!!,ItemActivity::class.java)
+                val intent = Intent(activity.context,ItemActivity::class.java)
                 intent.putExtra(INTENT_TODO_ID,list[p1].id)
                 intent.putExtra(INTENT_TODO_NAME,list[p1].name)
-                activity.context!!.startActivity(intent)
+                activity.startActivity(intent)
             }
 
             holder.menu.setOnClickListener {

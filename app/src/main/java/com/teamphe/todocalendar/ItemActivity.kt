@@ -1,30 +1,32 @@
 package com.teamphe.todocalendar
 
+import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.support.v7.widget.helper.ItemTouchHelper
+import android.view.*
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
-import com.teamphe.todocalendar.R
 import kotlinx.android.synthetic.main.activity_item.*
+import java.util.*
 
 class ItemActivity : AppCompatActivity() {
 
     lateinit var dbHandler: DBHandler
     var todoId: Long = -1
 
+    var list: MutableList<ToDoItem>? = null
+    var adapter : ItemAdapter? = null
+    var touchHelper : ItemTouchHelper? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_item)
-        setSupportActionBar(item_toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.title = intent.getStringExtra(INTENT_TODO_NAME)
@@ -55,9 +57,31 @@ class ItemActivity : AppCompatActivity() {
             dialog.show()
         }
 
+        touchHelper =
+                ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
+                    override fun onMove(
+                        p0: RecyclerView,
+                        p1: RecyclerView.ViewHolder,
+                        p2: RecyclerView.ViewHolder
+                    ): Boolean {
+                        val sourcePosition = p1.adapterPosition
+                        val targetPosition = p2.adapterPosition
+                        Collections.swap(list,sourcePosition,targetPosition)
+                        adapter?.notifyItemMoved(sourcePosition,targetPosition)
+                        return true
+                    }
+
+                    override fun onSwiped(p0: RecyclerView.ViewHolder, p1: Int) {
+                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                    }
+
+                })
+
+        touchHelper?.attachToRecyclerView(rv_item)
+
     }
 
-    fun updateItem(item :ToDoItem ){
+    fun updateItem(item: ToDoItem) {
         val dialog = AlertDialog.Builder(this)
         dialog.setTitle("Update ToDo Item")
         val view = layoutInflater.inflate(R.layout.dialog_dashboard, null)
@@ -85,7 +109,9 @@ class ItemActivity : AppCompatActivity() {
     }
 
     private fun refreshList() {
-        rv_item.adapter = ItemAdapter(this,dbHandler.getToDoItems(todoId))
+        list = dbHandler.getToDoItems(todoId)
+        adapter = ItemAdapter(this, list!!)
+        rv_item.adapter = adapter
     }
 
     class ItemAdapter(val activity: ItemActivity, val list: MutableList<ToDoItem>) :
@@ -98,6 +124,7 @@ class ItemActivity : AppCompatActivity() {
             return list.size
         }
 
+        @SuppressLint("ClickableViewAccessibility")
         override fun onBindViewHolder(holder: ViewHolder, p1: Int) {
             holder.itemName.text = list[p1].itemName
             holder.itemName.isChecked = list[p1].isCompleted
@@ -121,12 +148,20 @@ class ItemActivity : AppCompatActivity() {
             holder.edit.setOnClickListener {
                 activity.updateItem(list[p1])
             }
+
+            holder.move.setOnTouchListener { v, event ->
+                if(event.actionMasked== MotionEvent.ACTION_DOWN){
+                    activity.touchHelper?.startDrag(holder)
+                }
+                false
+            }
         }
 
         class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
             val itemName: CheckBox = v.findViewById(R.id.cb_item)
-            val edit : ImageView = v.findViewById(R.id.iv_edit)
-            val delete : ImageView = v.findViewById(R.id.iv_delete)
+            val edit: ImageView = v.findViewById(R.id.iv_edit)
+            val delete: ImageView = v.findViewById(R.id.iv_delete)
+            val move: ImageView = v.findViewById(R.id.iv_move)
         }
     }
 
